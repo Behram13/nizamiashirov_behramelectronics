@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qeydiyyat | Behram Electronics Inc.</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <span class="brand-badge">Behram Electronics Inc.</span>
+            <h1>Yeni Hesab Yarat</h1>
+            <p class="subtitle">Məlumatlarınız bcrypt və ISO 27001 standartı ilə qorunur</p>
+
+            <form id="registerForm">
+                <div class="input-group">
+                    <label for="username">İstifadəçi adı</label>
+                    <input type="text" id="username" placeholder="Məs: nizami01" required />
+                </div>
+                <div class="input-group">
+                    <label for="password">Şifrə</label>
+                    <input type="password" id="password" placeholder="••••••••" required />
+                </div>
+                <div class="input-group">
+                    <label for="confirmPassword">Şifrəni təkrarla</label>
+                    <input type="password" id="confirmPassword" placeholder="••••••••" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Qeydiyyatdan keç</button>
+            </form>
+
+            <div id="msg" class="status-msg"></div>
+
+            <div class="switch-link">
+                Artıq hesabınız var? <a href="login.html">Daxil ol</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const msg = document.getElementById("msg");
+
+            if (password !== confirmPassword) {
+                msg.style.color = "#f87171";
+                msg.textContent = "Şifrələr bir-biri ilə uyğun gəlmir!";
+                return;
+            }
+
+            try {
+                const res = await fetch("/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    msg.style.color = "#4ade80";
+                    msg.textContent = data.message + " Giriş səhifəsinə yönləndirilirsiniz...";
+                    setTimeout(() => window.location.href = "login.html", 1200);
+                } else {
+                    msg.style.color = "#f87171";
+                    msg.textContent = data.message;
+                }
+            } catch (err) {
+                msg.style.color = "#f87171";
+                msg.textContent = "Serverlə əlaqə xətası baş verdi!";
+            }
+        });
+    </script>
+</body>
+</html>

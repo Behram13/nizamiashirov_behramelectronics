@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Behram Electronics Inc. | Avadanlıqlar Kataloqu</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">⚡ Behram Electronics Inc.</div>
+        <div class="nav-actions">
+            <span class="user-pill" id="welcomeUser">Xoş gəldin, İstifadəçi</span>
+            <button class="cart-btn" onclick="showCartAlert()">
+                🛒 Səbət (<span id="cart-count">0</span>)
+            </button>
+            <a href="login.html" class="btn btn-outline" style="padding: 8px 14px; width: auto; font-size: 13px;">Çıxış</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section>
+            <h2 class="section-title">Avadanlıq Kateqoriyaları</h2>
+            <div class="category-list">
+                <button class="category-btn active" onclick="filterItems('Hamısı', this)">Hamısı 🌐</button>
+                <button class="category-btn" onclick="filterItems('Soyuducu', this)">Soyuducu 🧊</button>
+                <button class="category-btn" onclick="filterItems('Paltaryuyan', this)">Paltaryuyan 🧺</button>
+                <button class="category-btn" onclick="filterItems('Telefon', this)">Telefon 📱</button>
+                <button class="category-btn" onclick="filterItems('Notbuk', this)">Notbuk 💻</button>
+                <button class="category-btn" onclick="filterItems('Planşet', this)">Planşet 📟</button>
+                <button class="category-btn" onclick="filterItems('Televizor', this)">Televizor 📺</button>
+                <button class="category-btn" onclick="filterItems('Aksesuar', this)">Qulaqlıq & Saat 🎧</button>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Önərilən Avadanlıqlar</h2>
+            <div class="cards-grid" id="productGrid"></div>
+        </section>
+    </main>
+
+    <script>
+        const products = [
+            {
+                name: "Samsung Bespoke NoFrost Soyuducu",
+                category: "Soyuducu",
+                desc: "A++ enerji sinfi, 510 L həcm, rəqəmsal inverter mühərrik.",
+                price: "1899 ₼",
+                img: "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=700&q=80"
+            },
+            {
+                name: "LG AI DD 9 kq Paltaryuyan",
+                category: "Paltaryuyan",
+                desc: "Buxarla yuma texnologiyası, 1400 dövr/dəq, səssiz Direct Drive.",
+                price: "1149 ₼",
+                img: "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=700&q=80"
+            },
+            {
+                name: "iPhone 16 Pro Max 256GB",
+                category: "Telefon",
+                desc: "A18 Pro çip, 120Hz ProMotion OLED ekran, 48MP kamera sistemi.",
+                price: "3199 ₼",
+                img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=80"
+            },
+            {
+                name: "ASUS ROG Strix G16 Notbuk",
+                category: "Notbuk",
+                desc: "Intel Core i7, RTX 4070, 32GB DDR5 RAM, 1TB NVMe SSD.",
+                price: "3450 ₼",
+                img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80"
+            },
+            {
+                name: "iPad Air M2 11-inch Planşet",
+                category: "Planşet",
+                desc: "Liquid Retina ekran, Apple Pencil Pro dəstəyi, yüksək performans.",
+                price: "1599 ₼",
+                img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=700&q=80"
+            },
+            {
+                name: "Bosch Serie 6 İkikameralı Soyuducu",
+                category: "Soyuducu",
+                desc: "VitaFresh təravət sistemi, paslanmayan polad korpus, LED işıq.",
+                price: "1650 ₼",
+                img: "https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=700&q=80"
+            },
+            {
+                name: "Sony Bravia 65\" 4K Smart TV",
+                category: "Televizor",
+                desc: "Dolby Vision, Google TV interfeysi, 120Hz oyun rejimi.",
+                price: "2299 ₼",
+                img: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=700&q=80"
+            },
+            {
+                name: "Sony WH-1000XM5 Simsiz Qulaqlıq",
+                category: "Aksesuar",
+                desc: "Aktiv səsboğma (ANC), 30 saat batareya ömrü, sürətli şarj.",
+                price: "699 ₼",
+                img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"
+            }
+        ];
+
+        let cartCount = 0;
+        const savedUser = localStorage.getItem("behram_user");
+        if (savedUser) {
+            document.getElementById("welcomeUser").textContent = `👤 ${savedUser}`;
+        }
+
+        function renderProducts(categoryFilter = "Hamısı") {
+            const grid = document.getElementById("productGrid");
+            grid.innerHTML = "";
+
+            const filtered = categoryFilter === "Hamısı"
+                ? products
+                : products.filter(p => p.category === categoryFilter);
+
+            filtered.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "product-card";
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}" />
+                    <div class="product-info">
+                        <span class="product-tag">${item.category}</span>
+                        <h3>${item.name}</h3>
+                        <p class="product-desc">${item.desc}</p>
+                        <div class="product-footer">
+                            <span class="price">${item.price}</span>
+                            <button class="add-btn" onclick="addToCart('${item.name}')">+ Səbətə at</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterItems(category, btnElement) {
+            document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+            btnElement.classList.add("active");
+            renderProducts(category);
+        }
+
+        function addToCart(productName) {
+            cartCount++;
+            document.getElementById("cart-count").textContent = cartCount;
+        }
+
+        function showCartAlert() {
+            alert(`Səbətinizdə hazırda ${cartCount} ədəd avadanlıq var.`);
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
